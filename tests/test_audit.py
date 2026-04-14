@@ -79,3 +79,23 @@ def test_audit_log_skips_malformed_lines(log_file: Path):
     entries = log.read_all()
     assert len(entries) == 1
     assert entries[0].action == "push"
+
+
+def test_audit_entry_timestamp_is_set_automatically():
+    """AuditEntry should populate timestamp automatically when not provided."""
+    entry = AuditEntry(action="push", actor="KEY1", target="vault/.env.gpg")
+    assert entry.timestamp is not None
+    assert isinstance(entry.timestamp, str)
+    assert len(entry.timestamp) > 0
+
+
+def test_audit_log_record_persists_to_disk(log_file: Path):
+    """Recorded entries should be written as valid JSON lines to the log file."""
+    log = AuditLog(str(log_file))
+    log.record(AuditEntry(action="push", actor="KEY1", target="vault/.env.gpg"))
+
+    lines = log_file.read_text().splitlines()
+    assert len(lines) == 1
+    data = json.loads(lines[0])
+    assert data["action"] == "push"
+    assert data["actor"] == "KEY1"
