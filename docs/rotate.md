@@ -44,6 +44,10 @@ If a rotation goes wrong, restore the previous vault:
 cp .env.bak.gpg .env.gpg
 ```
 
+> **Note:** Only one backup is kept at a time. Running `rotate` again will
+> overwrite `.env.bak.gpg`. If you need to preserve multiple snapshots,
+> copy the backup to a safe location before rotating again.
+
 ## Passphrase
 
 If your GPG key is protected by a passphrase, set `ENVAULT_PASSPHRASE` in the
@@ -52,4 +56,18 @@ environment before running `rotate`:
 ```bash
 export ENVAULT_PASSPHRASE="your-passphrase"
 envault rotate -r NEW_KEY_ID
+```
+
+## Audit log format
+
+When `--audit-file` is used, each rotation appends a single JSON line with the
+following fields:
+
+```json
+{
+  "timestamp": "2024-05-01T12:34:56Z",
+  "action": "rotate",
+  "recipients": ["FINGERPRINT1", "FINGERPRINT2"],
+  "dry_run": false
+}
 ```
