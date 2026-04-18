@@ -11,6 +11,12 @@ from envault.lint import LintError, lint_env
 
 def cmd_lint(args: argparse.Namespace) -> None:
     path = Path(args.file)
+    if not path.exists():
+        print(f"error: file not found: {path}", file=sys.stderr)
+        sys.exit(1)
+    if not path.is_file():
+        print(f"error: not a file: {path}", file=sys.stderr)
+        sys.exit(1)
     try:
         result = lint_env(path)
     except LintError as exc:
