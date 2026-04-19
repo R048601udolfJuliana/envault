@@ -69,3 +69,12 @@ def list_tags(directory: Path) -> Dict[str, List[str]]:
 def files_for_tag(directory: Path, tag: str) -> List[str]:
     """Return files associated with *tag*, or empty list if tag unknown."""
     return load_tags(directory).get(tag, [])
+
+
+def tags_for_file(directory: Path, filename: str) -> List[str]:
+    """Return all tags associated with *filename*, or empty list if none."""
+    return [
+        tag
+        for tag, files in load_tags(directory).items()
+        if filename in files
+    ]
