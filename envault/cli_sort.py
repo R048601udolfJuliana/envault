@@ -22,6 +22,11 @@ def cmd_sort(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     src = Path(cfg.env_file)
+
+    if not src.exists():
+        print(f"[envault] sort error: env file not found: {src}", file=sys.stderr)
+        sys.exit(1)
+
     dest = Path(args.output) if getattr(args, "output", None) else None
 
     try:
