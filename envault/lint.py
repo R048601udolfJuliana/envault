@@ -49,7 +49,12 @@ def lint_env(path: Path) -> LintResult:
     result = LintResult()
     seen_keys: dict[str, int] = {}
 
-    for line_no, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise LintError(f"Could not read file: {path}: {exc}") from exc
+
+    for line_no, raw in enumerate(text.splitlines(), start=1):
         line = raw.strip()
 
         # Skip blanks and comments
