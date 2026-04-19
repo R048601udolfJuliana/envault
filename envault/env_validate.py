@@ -68,7 +68,13 @@ def validate_env(
     if pattern_rules:
         for key, pattern in pattern_rules.items():
             if key in env and env[key] != "":
-                if not re.fullmatch(pattern, env[key]):
+                try:
+                    compiled = re.compile(pattern)
+                except re.error as exc:
+                    raise ValidateError(
+                        f"Invalid regex pattern for key '{key}': {exc}"
+                    ) from exc
+                if not compiled.fullmatch(env[key]):
                     issues.append(ValidationIssue(key, f"value does not match pattern '{pattern}'"))
 
     return ValidationResult(issues=issues)
