@@ -82,6 +82,20 @@ def test_cmd_rotate_exits_on_rotation_error(mock_config: EnvaultConfig):
     assert exc_info.value.code == 1
 
 
+def test_cmd_rotate_error_message_printed(mock_config: EnvaultConfig, capsys):
+    """Ensure the RotationError message is surfaced to stderr on failure."""
+    with (
+        patch("envault.cli_rotate._load_config", return_value=mock_config),
+        patch("envault.cli_rotate.passphrase_from_env", return_value=None),
+        patch("envault.cli_rotate.rotate", side_effect=RotationError("boom")),
+        pytest.raises(SystemExit),
+    ):
+        cmd_rotate(_ns())
+
+    err = capsys.readouterr().err
+    assert "boom" in err
+
+
 def test_register_subcommand_adds_rotate():
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers()
