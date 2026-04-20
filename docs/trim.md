@@ -37,8 +37,15 @@ Write the trimmed result to a new file:
 envault trim --dest .env.clean
 ```
 
+Trim a specific file and write output to a separate destination:
+
+```bash
+envault trim --file .env.staging --dest .env.staging.clean
+```
+
 ## Notes
 
 - Comment lines (`# ...`) and blank lines are preserved unchanged.
 - Lines without an `=` sign are left untouched.
 - Only the *value* portion (right of the first `=`) is trimmed; key names are not modified.
+- Quoted values (e.g. `KEY=" value "`) are trimmed of whitespace *outside* the quotes; inner whitespace is preserved.
