@@ -72,3 +72,20 @@ def keys_from_template(template_path: Path) -> List[str]:
     if not template_path.exists():
         raise TemplateError(f"Template file not found: {template_path}")
     return _parse_env_keys(template_path.read_text(encoding="utf-8"))
+
+
+def validate_env_against_template(
+    env_path: Path,
+    template_path: Path,
+) -> List[str]:
+    """Check that all keys in *template_path* are present in *env_path*.
+
+    Returns a list of missing variable names.  An empty list means the
+    .env file satisfies every key declared in the template.
+    """
+    if not env_path.exists():
+        raise TemplateError(f"Env file not found: {env_path}")
+
+    required = keys_from_template(template_path)
+    present = set(_parse_env_keys(env_path.read_text(encoding="utf-8")))
+    return [key for key in required if key not in present]
