@@ -97,8 +97,15 @@ def test_lowercase_env_missing_file_raises(tmp_dir: Path):
 def test_lowercase_env_preserves_comments(tmp_dir: Path):
     content = "# section\nDB_HOST=localhost\n\nAPI_KEY=abc\n"
     f = _write(tmp_dir / ".env", content)
-    lowercase_env(f)
-    result = f.read_text()
-    assert "# section" in result
-    assert "db_host=localhost" in result
-    assert "api_key=abc" in result
+    changed = lowercase_env(f)
+    assert set(changed) == {"db_host", "api_key"}
+    assert f.read_text() == "# section\ndb_host=localhost\n\napi_key=abc\n"
+
+
+def test_lowercase_env_dry_run_with_dest_does_not_create_dest(tmp_dir: Path):
+    """When dry_run=True and a destination path is provided, the destination
+    file should NOT be created."""
+    src = _write(tmp_dir / ".env", "DB_HOST=localhost\n")
+    dest = tmp_dir / ".env.lower"
+    lowercase_env(src, dest, dry_run=True)
+    assert not dest.exists()
