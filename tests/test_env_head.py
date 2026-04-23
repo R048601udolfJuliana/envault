@@ -35,6 +35,18 @@ def test_parse_env_strips_quotes():
     assert pairs == [("KEY", "hello world")]
 
 
+def test_parse_env_empty_string():
+    """An empty input should return an empty list without raising."""
+    pairs = _parse_env("")
+    assert pairs == []
+
+
+def test_parse_env_value_contains_equals():
+    """Values that contain '=' should be preserved correctly."""
+    pairs = _parse_env("URL=http://example.com?a=1&b=2\n")
+    assert pairs == [("URL", "http://example.com?a=1&b=2")]
+
+
 def test_head_env_returns_first_n(tmp_dir: Path):
     f = _write(tmp_dir / ".env", "A=1\nB=2\nC=3\nD=4\n")
     result = head_env(f, n=2)
