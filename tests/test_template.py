@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pathlib import Path
 
-from envault.template import  keys_from_template, _parse_env_keys
+from envault.template import keys_from_template, _parse_env_keys
 
 
 @pytest.fixture()
@@ -33,6 +33,17 @@ def test_parse_env_keys_ignores_comments_and_blanks():
 def test_parse_env_keys_no_value_still_captured():
     text = "KEY=\n"
     assert _parse_env_keys(text) == ["KEY"]
+
+
+def test_parse_env_keys_empty_string():
+    """An empty input should return an empty list, not raise."""
+    assert _parse_env_keys("") == []
+
+
+def test_parse_env_keys_only_comments_and_blanks():
+    """Input with only comments and blank lines should yield no keys."""
+    text = "# just a comment\n\n   \n"
+    assert _parse_env_keys(text) == []
 
 
 # --- generate_template ---
@@ -88,3 +99,9 @@ def test_keys_from_template_returns_names(tmp_dir: Path):
 def test_keys_from_template_missing_file_raises(tmp_dir: Path):
     with pytest.raises(TemplateError, match="not found"):
         keys_from_template(tmp_dir / "missing.template")
+
+
+def test_keys_from_template_empty_file_returns_empty_list(tmp_dir: Path):
+    """An empty template file should return an empty list, not raise."""
+    tpl = _write(tmp_dir / ".env.template", "")
+    assert keys_from_template(tpl) == []
